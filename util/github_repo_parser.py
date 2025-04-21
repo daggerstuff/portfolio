@@ -79,12 +79,12 @@ def main():
     # Example project details
     project_json = parser.create_project_json(
         owner='aabdoo23',
-        repo='foodies',
-        title='Foodies',
-        description='A project that uses image processing and OCR to restore faded English text from historical documents. It applies multiple enhancement steps, uses Tesseract OCR, and refines results via Gemini LLM.',
-        repo_url='https://github.com/aabdoo23/foodies',
-        live_url='https://aabdoo23.github.io/foodies',
-        tech_stack=['Python', 'OpenCV', 'Tesseract OCR', 'Gradio', 'Gemini LLM']
+        repo='portfolio',
+        title='Portfolio (This Website)',
+        description='An open source interactive portfolio website, with a clean and modern design, sections for education, experience, skills, competitions, and more. Built with Astro.js, Tailwind CSS, TypeScript, React, and Vercel.',
+        repo_url='https://github.com/aabdoo23/portfolio',
+        live_url='https://aabdoo23.vercel.app',
+        tech_stack=['Astro.js', 'Tailwind CSS', 'TypeScript', 'React', 'Vercel']
     )
 
     # Save project JSON and get the path
