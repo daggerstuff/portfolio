@@ -1,7 +1,5 @@
 ---
 import '../../styles/global.css';
-// @ts-ignore - package exports named AstroSeo but types may not resolve correctly in some setups
-import { AstroSeo } from '@astrolib/seo';
 import { userConfig } from '../../config/index';
 
 import { getAppConfig } from '../../lib/config-server';
@@ -31,22 +29,24 @@ const ogUrl = Astro.props.openGraph?.url || siteOrigin;
 />
 <meta name='author' content="" />
 
-<!-- SEO Configuration -->
-<AstroSeo
-  title={Astro.props.title || seoTitle}
-  description={Astro.props.description || seoDescription}
-  canonical={canonicalUrl}
-  openGraph={{
-    url: ogUrl,
-    title: Astro.props.openGraph?.title || seoTitle,
-    description: Astro.props.openGraph?.description || seoDescription,
-    ...(ogImageUrl ? { images: [{ url: ogImageUrl }] } : {}),
-    site_name: Astro.props.openGraph?.site_name || "",
-  }}
-  twitter={{
-    cardType: 'summary_large_image',
-  }}
-/>
+<!-- SEO Configuration (direct meta tags, replacing @astrolib/seo) -->
+<title>{Astro.props.title || seoTitle}</title>
+<meta name="description" content={Astro.props.description || seoDescription} />
+{canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={ogUrl || canonicalUrl} />
+<meta property="og:title" content={Astro.props.openGraph?.title || Astro.props.title || seoTitle} />
+<meta property="og:description" content={Astro.props.openGraph?.description || Astro.props.description || seoDescription} />
+<meta property="og:site_name" content={Astro.props.openGraph?.site_name || ""} />
+{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={Astro.props.openGraph?.title || Astro.props.title || seoTitle} />
+<meta name="twitter:description" content={Astro.props.openGraph?.description || Astro.props.description || seoDescription} />
+{ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
 {seoKeywords.length > 0 && (
   <meta name="keywords" content={seoKeywords.join(', ')} />
 )}
