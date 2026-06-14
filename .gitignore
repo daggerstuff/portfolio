@@ -27,4 +27,4 @@ pnpm-debug.log*
 .vscode/
 
 # vercel setting folder
-.vercel/.*.swp
+.vercel/
