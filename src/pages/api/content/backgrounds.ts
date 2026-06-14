@@ -9,12 +9,16 @@ const json = (data: unknown, status = 200) =>
     },
   });
 
-const error = (message: string, status = 500) => json({ error: message }, status);
-
 export const GET: APIRoute = async () => {
-  // If Supabase is not configured, return empty array
   if (!isSupabaseConfigured()) {
-    console.warn('[api/content/backgrounds] Supabase not configured, returning empty array');
+    const supabaseUrl = import.meta.env.SUPABASE_URL;
+    const supabaseKey = import.meta.env.SUPABASE_KEY;
+    console.error(
+      '[api/content/backgrounds] Supabase not configured. SUPABASE_URL=%s, SUPABASE_KEY=%s, runtime=%s',
+      supabaseUrl ? 'SET' : 'MISSING',
+      supabaseKey ? 'SET' : 'MISSING',
+      typeof globalThis.process?.env?.VERCEL !== 'undefined' ? 'vercel' : 'unknown'
+    );
     return json([]);
   }
 
@@ -25,13 +29,14 @@ export const GET: APIRoute = async () => {
       .order('created_at', { ascending: false });
 
     if (dbError) {
-      console.error('[api/content/backgrounds] Database error:', dbError);
+      console.error('[api/content/backgrounds] Database error:', dbError.message, dbError.code);
       return json([]);
     }
 
+    console.log('[api/content/backgrounds] Returned %d backgrounds', data?.length ?? 0);
     return json(data || []);
   } catch (err) {
-    console.error('[api/content/backgrounds] Unexpected error:', err);
+    console.error('[api/content/backgrounds] Unexpected error:', err instanceof Error ? err.message : err);
     return json([]);
   }
 };

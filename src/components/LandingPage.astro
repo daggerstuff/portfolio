@@ -1,26 +1,41 @@
 ---
 import AppLayout from '../layouts/AppLayout';
+import macBg1 from '../assets/images/mac-background1.jpg';
+import macBg2 from '../assets/images/mac-background2.jpg';
+import macBg3 from '../assets/images/mac-background3.jpg';
 
-// Fetch backgrounds from API
-let backgrounds: Array<{ id: string; url: string; display_url?: string }> = [];
+type BackgroundEntry = { id: string; url: string; display_url?: string };
+
+// Fetch backgrounds from API using Astro.site (avoids internal Vercel URL on cold starts)
+let backgrounds: BackgroundEntry[] = [];
 let backgroundMap: Record<string, string> = {};
 
 try {
-  // Try to fetch from API - use absolute URL for SSR
-  const baseUrl = import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
-  const apiUrl = `${baseUrl}/api/content/backgrounds`;
+  const siteUrl = Astro.site?.origin || import.meta.env.PUBLIC_SITE_URL || Astro.url.origin;
+  const apiUrl = `${siteUrl}/api/content/backgrounds`;
   const response = await fetch(apiUrl);
   if (response.ok) {
-    backgrounds = await response.json();
+    backgrounds = (await response.json()) as BackgroundEntry[];
+  } else {
+    console.warn('[LandingPage] API returned status %d for %s', response.status, apiUrl);
   }
 } catch (error) {
-  console.warn('[LandingPage] Failed to fetch backgrounds from API');
+  console.warn('[LandingPage] Failed to fetch backgrounds from API:', error instanceof Error ? error.message : error);
 }
 
-// Create background map from API backgrounds - use full resolution URL
+// Build background map from API results
 backgroundMap = Object.fromEntries(
   backgrounds.map((bg, index) => [`bg-${index + 1}`, bg.url])
 );
+
+// If no API backgrounds, inject local fallbacks (Vite-bundled, always available)
+if (Object.keys(backgroundMap).length === 0) {
+  backgroundMap = {
+    'local-1': macBg1,
+    'local-2': macBg2,
+    'local-3': macBg3,
+  };
+}
 
 function getRandomBackground() {
   const bgKeys = Object.keys(backgroundMap);
