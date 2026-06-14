@@ -9,15 +9,18 @@ const seoTitle = config.seo.title || userConfig.seo.title;
 const seoDescription = config.seo.description || userConfig.seo.description;
 const seoKeywords = config.seo.keywords;
 
-let ogImageUrl: string | undefined = undefined;
-if (config.backgrounds.length > 0 && config.backgrounds[0].url) {
-  ogImageUrl = config.backgrounds[0].url;
-}
+// Collect all background URLs for preloading (API sources + local fallbacks)
+const allBackgroundUrls = config.backgrounds.map(bg => bg.url).filter(Boolean);
 
 // Build safe defaults for SEO
 const siteOrigin = Astro.site ? new URL('/', Astro.site).origin : undefined;
 const canonicalUrl = Astro.props.canonical || siteOrigin;
 const ogUrl = Astro.props.openGraph?.url || siteOrigin;
+
+let ogImageUrl: string | undefined = undefined;
+if (allBackgroundUrls.length > 0) {
+  ogImageUrl = allBackgroundUrls[0];
+}
 ---
 
 <!-- Core meta tags -->
@@ -82,12 +85,19 @@ const ogUrl = Astro.props.openGraph?.url || siteOrigin;
 <!-- Auto-generated sitemap -->
 <link rel='sitemap' href='/sitemap-index.xml' />
 
-<!-- Preload background images for performance -->
+<!-- Preload background images for LCP performance -->
 {ogImageUrl && (
   <link
     rel='preload'
     href={ogImageUrl}
     as='image'
     fetchpriority='high'
+  />
+)}
+{allBackgroundUrls.length > 1 && (
+  <link
+    rel='preload'
+    href={allBackgroundUrls[1]}
+    as='image'
   />
 )}

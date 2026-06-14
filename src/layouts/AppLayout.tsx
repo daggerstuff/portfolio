@@ -12,6 +12,7 @@ import GlitchApp from "../components/GlitchApp";
 import IRCContact from "../components/IRCContact";
 import ProjectsAsExploits from "../components/ProjectsAsExploits";
 import SeizedBackground from "../components/SeizedBackground";
+import BootSequence from "../components/BootSequence";
 
 interface AppLayoutProps {
   initialBg: string;
@@ -170,94 +171,119 @@ export default function Desktop({ initialBg, backgroundMap }: AppLayoutProps) {
   const backgroundUrl = backgroundMap[currentBg] || backgroundMap[initialBg] || "";
 
   return (
-    <SeizedBackground>
-      <div className="relative w-screen h-screen overflow-hidden">
-        {backgroundUrl && (
+    <BootSequence>
+      <SeizedBackground>
+        <div className="relative w-screen h-screen overflow-hidden">
+          {backgroundUrl && (
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${backgroundUrl})` }}
+            />
+          )}
+
+          {/* Ambient gradient orb -- slow-moving depth effect */}
           <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${backgroundUrl})` }}
-          />
-        )}
+            className="absolute inset-0 pointer-events-none overflow-hidden"
+            aria-hidden="true"
+          >
+            <div
+              className="absolute w-[60vw] h-[60vw] rounded-full opacity-[0.07] animate-ambient-drift"
+              style={{
+                background: 'radial-gradient(circle, rgba(120,120,255,0.3) 0%, transparent 70%)',
+                top: '20%',
+                left: '-10%',
+              }}
+            />
+            <div
+              className="absolute w-[40vw] h-[40vw] rounded-full opacity-[0.05] animate-ambient-drift-reverse"
+              style={{
+                background: 'radial-gradient(circle, rgba(255,120,200,0.25) 0%, transparent 70%)',
+                bottom: '10%',
+                right: '-5%',
+              }}
+            />
+          </div>
 
-        <div className="relative z-10">
-          <MacToolbar
-            onShowTutorial={() => { }}
-            onOpenSpotlight={() => setIsSpotlightOpen(true)}
-            onOpenMissionControl={() => setIsMissionControlOpen(true)}
-            onToggleShortcuts={() => setShowShortcuts((s) => !s)}
-            onCloseAllWindows={closeAllWindows}
-            onShuffleBackground={shuffleBackground}
+          <div className="relative z-10 animate-fade-in">
+            <MacToolbar
+              onShowTutorial={() => { }}
+              onOpenSpotlight={() => setIsSpotlightOpen(true)}
+              onOpenMissionControl={() => setIsMissionControlOpen(true)}
+              onToggleShortcuts={() => setShowShortcuts((s) => !s)}
+              onCloseAllWindows={closeAllWindows}
+              onShuffleBackground={shuffleBackground}
+            />
+          </div>
+
+          <div className="relative z-0 flex items-center justify-center h-[calc(100vh-10rem)] md:h-[calc(100vh-1.5rem)] pt-6"></div>
+
+          <MobileDock
+            onNotesClick={() => {
+              handleAppOpen("notes");
+            }}
+            onPhotoAlbumClick={() => {
+              handleAppOpen("photoAlbum");
+            }}
           />
+          <DesktopDock
+            onNotesClick={() => {
+              handleAppOpen("notes");
+            }}
+            onPhotoAlbumClick={() => {
+              handleAppOpen("photoAlbum");
+            }}
+            onGlitchClick={() => setShowGlitch(true)}
+            onIRCClick={() => setShowIRC(true)}
+            onExploitsClick={() => setShowExploits(true)}
+            activeApps={{
+              notes: state.windows.notes,
+              music: state.windows.music,
+              photoAlbum: state.windows.photoAlbum,
+              glitch: showGlitch,
+              irc: showIRC,
+              exploits: showExploits,
+            }}
+            config={config}
+          />
+
+          <NotesApp
+            isOpen={state.windows.notes}
+            onClose={() => {
+              handleAppClose("notes");
+            }}
+          />
+          <PhotoAlbumPlayer
+            isOpen={state.windows.photoAlbum}
+            onClose={() => {
+              handleAppClose("photoAlbum");
+            }}
+            albumUrl={albumUrl}
+          />
+          <Spotlight
+            isOpen={isSpotlightOpen}
+            onClose={() => setIsSpotlightOpen(false)}
+            actions={{
+              openNotes: () => handleAppOpen("notes"),
+              openNotesSection: () => openNotesSection(),
+              openPhotoAlbum: () => handleAppOpen("photoAlbum"),
+              closeAllWindows,
+              shuffleBackground,
+            }}
+          />
+          <ShortcutsOverlay open={showShortcuts} onClose={() => setShowShortcuts(false)} />
+          <ShortcutHint />
+          <MissionControl
+            isOpen={isMissionControlOpen}
+            onClose={() => setIsMissionControlOpen(false)}
+            activeApps={activeApps}
+            onAppClick={(app) => handleAppOpen(app)}
+            onAppClose={(app) => handleAppClose(app)}
+          />
+          <GlitchApp isOpen={showGlitch} onClose={() => setShowGlitch(false)} />
+          <IRCContact isOpen={showIRC} onClose={() => setShowIRC(false)} />
+          <ProjectsAsExploits isOpen={showExploits} onClose={() => setShowExploits(false)} />
         </div>
-
-        <div className="relative z-0 flex items-center justify-center h-[calc(100vh-10rem)] md:h-[calc(100vh-1.5rem)] pt-6"></div>
-
-        <MobileDock
-          onNotesClick={() => {
-            handleAppOpen("notes");
-          }}
-          onPhotoAlbumClick={() => {
-            handleAppOpen("photoAlbum");
-          }}
-        />
-        <DesktopDock
-          onNotesClick={() => {
-            handleAppOpen("notes");
-          }}
-          onPhotoAlbumClick={() => {
-            handleAppOpen("photoAlbum");
-          }}
-          onGlitchClick={() => setShowGlitch(true)}
-          onIRCClick={() => setShowIRC(true)}
-          onExploitsClick={() => setShowExploits(true)}
-          activeApps={{
-            notes: state.windows.notes,
-            music: state.windows.music,
-            photoAlbum: state.windows.photoAlbum,
-            glitch: showGlitch,
-            irc: showIRC,
-            exploits: showExploits,
-          }}
-          config={config}
-        />
-
-        <NotesApp
-          isOpen={state.windows.notes}
-          onClose={() => {
-            handleAppClose("notes");
-          }}
-        />
-        <PhotoAlbumPlayer
-          isOpen={state.windows.photoAlbum}
-          onClose={() => {
-            handleAppClose("photoAlbum");
-          }}
-          albumUrl={albumUrl}
-        />
-        <Spotlight
-          isOpen={isSpotlightOpen}
-          onClose={() => setIsSpotlightOpen(false)}
-          actions={{
-            openNotes: () => handleAppOpen("notes"),
-            openNotesSection: () => openNotesSection(),
-            openPhotoAlbum: () => handleAppOpen("photoAlbum"),
-            closeAllWindows,
-            shuffleBackground,
-          }}
-        />
-        <ShortcutsOverlay open={showShortcuts} onClose={() => setShowShortcuts(false)} />
-        <ShortcutHint />
-        <MissionControl
-          isOpen={isMissionControlOpen}
-          onClose={() => setIsMissionControlOpen(false)}
-          activeApps={activeApps}
-          onAppClick={(app) => handleAppOpen(app)}
-          onAppClose={(app) => handleAppClose(app)}
-        />
-        <GlitchApp isOpen={showGlitch} onClose={() => setShowGlitch(false)} />
-        <IRCContact isOpen={showIRC} onClose={() => setShowIRC(false)} />
-        <ProjectsAsExploits isOpen={showExploits} onClose={() => setShowExploits(false)} />
-      </div>
-    </SeizedBackground>
+      </SeizedBackground>
+    </BootSequence>
   );
 }

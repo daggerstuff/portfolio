@@ -36,6 +36,7 @@ export default function MacToolbar({
 }: MacToolbarProps) {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [showDateTooltip, setShowDateTooltip] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -82,6 +83,15 @@ export default function MacToolbar({
     hour = hour ? hour : 12;
 
     return `${hour}:${minute}`;
+  };
+
+  const formatFullDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
   const handleVSCodeClick = () => {
@@ -227,8 +237,17 @@ export default function MacToolbar({
             role='button'
             aria-label='Open search'
           />
-          <span className='cursor-default'>
+          <span
+            className='cursor-default relative'
+            onMouseEnter={() => setShowDateTooltip(true)}
+            onMouseLeave={() => setShowDateTooltip(false)}
+          >
             {formatMacDate(currentDateTime)}
+            {showDateTooltip && (
+              <span className='absolute top-full right-0 mt-1 bg-black/80 backdrop-blur-sm text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50'>
+                {formatFullDate(currentDateTime)}
+              </span>
+            )}
           </span>
         </div>
       </div>

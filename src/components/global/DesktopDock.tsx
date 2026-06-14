@@ -35,6 +35,7 @@ const DesktopDock = ({
   const [showAppleMusic, setShowAppleMusic] = useState(false);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const [playlistId, setPlaylistId] = useState<string | null>(null);
+  const [hasAnimated, setHasAnimated] = useState(false);
   const dockRef = useRef<HTMLDivElement>(null);
 
   // Update playlistId when config changes
@@ -45,6 +46,12 @@ const DesktopDock = ({
       setPlaylistId(null);
     }
   }, [config]);
+
+  // Mark entrance animation as complete after initial mount
+  useEffect(() => {
+    const timer = setTimeout(() => setHasAnimated(true), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleAppleMusicClick = () => {
     setShowAppleMusic(true);
@@ -167,6 +174,7 @@ const DesktopDock = ({
               const Icon = item.icon;
               const scale = calculateScale(index, icons.length);
               const hasSvg = item.iconSvg !== undefined;
+              const springDelay = hasAnimated ? 0 : index * 80;
               return (
                 <button
                   key={item.id}
@@ -180,10 +188,11 @@ const DesktopDock = ({
                   }}
                   onMouseEnter={() => setHoveredIcon(item.id)}
                   onMouseLeave={() => setHoveredIcon(null)}
-                  className="relative group"
+                  className={`relative group ${!hasAnimated ? 'animate-dock-spring-in opacity-0' : ''}`}
                   style={{
                     transform: `scale(${scale})`,
                     transition: "transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                    animationDelay: `${springDelay}ms`,
                   }}
                 >
                   <div
@@ -196,7 +205,7 @@ const DesktopDock = ({
                     ) : null}
                     {item.active && (
                       <span
-                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rounded-full"
+                        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rounded-full animate-dot-breathe"
                         aria-hidden="true"
                       />
                     )}

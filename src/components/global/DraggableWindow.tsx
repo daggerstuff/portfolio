@@ -172,7 +172,7 @@ export default function DraggableWindow({
         isMobile 
           ? 'fixed inset-0 m-4 rounded-xl' 
           : 'absolute rounded-xl'
-      } bg-[#1d1d1f] shadow-xl overflow-hidden p-0 transition-all duration-300 ${
+      } bg-[#1d1d1f] shadow-xl overflow-hidden p-0 transition-all duration-300 animate-window-enter ${
         isDragging ? 'cursor-grabbing' : 'cursor-default'
       } ${className}`}
       style={{

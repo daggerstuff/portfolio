@@ -13,3 +13,83 @@
     font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
   }
 }
+
+/* Custom animations for UX overhaul */
+@layer utilities {
+  /* Ambient gradient orb drift */
+  @keyframes ambient-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(5vw, -3vh) scale(1.05); }
+    50% { transform: translate(2vw, 5vh) scale(0.95); }
+    75% { transform: translate(-3vw, -2vh) scale(1.02); }
+  }
+
+  @keyframes ambient-drift-reverse {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(-4vw, 3vh) scale(0.97); }
+    50% { transform: translate(-2vw, -4vh) scale(1.04); }
+    75% { transform: translate(3vw, 2vh) scale(0.98); }
+  }
+
+  .animate-ambient-drift {
+    animation: ambient-drift 25s ease-in-out infinite;
+  }
+
+  .animate-ambient-drift-reverse {
+    animation: ambient-drift-reverse 30s ease-in-out infinite;
+  }
+
+  /* Dock icon spring entrance */
+  @keyframes dock-spring-in {
+    0% { transform: translateY(80px) scale(0.5); opacity: 0; }
+    60% { transform: translateY(-8px) scale(1.1); opacity: 1; }
+    80% { transform: translateY(4px) scale(0.95); }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .animate-dock-spring-in {
+    animation: dock-spring-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* Active dot breathing pulse */
+  @keyframes dot-breathe {
+    0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.5; transform: translateX(-50%) scale(1.6); }
+  }
+
+  .animate-dot-breathe {
+    animation: dot-breathe 2s ease-in-out infinite;
+  }
+
+  /* Window entrance animation */
+  @keyframes window-enter {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-window-enter {
+    animation: window-enter 0.2s ease-out both;
+  }
+
+  /* Desktop fade-in after boot */
+  @keyframes desktop-fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .animate-desktop-fade-in {
+    animation: desktop-fade-in 0.6s ease-out both;
+  }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ambient-drift,
+  .animate-ambient-drift-reverse,
+  .animate-dock-spring-in,
+  .animate-dot-breathe,
+  .animate-window-enter,
+  .animate-desktop-fade-in {
+    animation: none !important;
+  }
+}
